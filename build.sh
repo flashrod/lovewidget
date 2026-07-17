@@ -5,6 +5,7 @@ SWIFT=${SWIFT:-swift}
 PRODUCT_NAME="LoveWidget"
 APP_BUNDLE="${PRODUCT_NAME}.app"
 CONFIG_FILE="Config.xcconfig"
+ICON_FILE="App/Resources/AppIcon.icns"
 
 echo "==> Reading Supabase configuration..."
 
@@ -55,6 +56,8 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
 	<string>LoveWidget</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.0</string>
 	<key>CFBundleVersion</key>
@@ -76,6 +79,13 @@ EOF
 echo ""
 echo "==> Copying executable..."
 cp "$EXECUTABLE_PATH" "$APP_BUNDLE/Contents/MacOS/$PRODUCT_NAME"
+
+if [ -f "$ICON_FILE" ]; then
+	echo "==> Copying app icon..."
+	cp "$ICON_FILE" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
+else
+	echo "==> App icon not found at $ICON_FILE (skipping)"
+fi
 
 echo ""
 echo "==> Signing with ad-hoc certificate + sandbox entitlements..."

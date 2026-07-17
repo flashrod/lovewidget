@@ -6,6 +6,7 @@ BUNDLE_ID="com.lovewidget.app"
 VERSION="${1:-${VERSION:-1.0.0}}"
 CONFIG_FILE="Config.xcconfig"
 ENTITLEMENTS="LoveWidget.entitlements"
+ICON_FILE="App/Resources/AppIcon.icns"
 
 ARCH=$(uname -m)
 BUILD_DIR=".build/${ARCH}-apple-macosx/release"
@@ -50,6 +51,8 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
 	<string>LoveWidget</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$VERSION</string>
 	<key>CFBundleVersion</key>
@@ -70,6 +73,13 @@ EOF
 
 BIN_PATH="$BUILD_DIR/$APP_NAME"
 cp "$BIN_PATH" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+
+if [ -f "$ICON_FILE" ]; then
+	echo "==> Copying app icon..."
+	cp "$ICON_FILE" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
+else
+	echo "==> App icon not found at $ICON_FILE (skipping)"
+fi
 
 echo "==> Signing (ad-hoc)..."
 codesign --force --sign - --entitlements "$ENTITLEMENTS" --options runtime "$APP_BUNDLE"
