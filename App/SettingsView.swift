@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var defaultBrushWidth: Double = 3.0
     @State private var defaultColor: StrokeColor = .crimson
     @State private var showClearConfirmation = false
+    @State private var showSavedIndicator = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -63,6 +64,7 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(nsColor: .windowBackgroundColor))
+        .onAppear(perform: loadSettings)
         .confirmationDialog(
             "Clear all drawing data?",
             isPresented: $showClearConfirmation
@@ -83,8 +85,71 @@ struct SettingsView: View {
                 .foregroundStyle(Color.accentColor)
             Text("Settings")
                 .font(.system(size: 15, weight: .semibold))
+            Spacer()
+            if showSavedIndicator {
+                Text("Saved")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .transition(.opacity)
+            }
+            Button("Save") {
+                saveSettings()
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+            .keyboardShortcut("s", modifiers: .command)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
+    }
+
+    private func loadSettings() {
+        let settings = (try? AppGroupStorage.shared.loadSettings()) ?? AppUserSettings()
+        displayName = settings.displayName
+        notificationsEnabled = settings.notificationsEnabled
+        launchAtLogin = settings.launchAtLogin
+        prefersDarkMode = settings.prefersDarkMode
+        defaultBrushWidth = settings.defaultBrushWidth
+        defaultColor = settings.defaultColor
+    }
+
+    private func saveSettings() {
+        let settings = AppUserSettings(
+            displayName: displayName.trimmingCharacters(in: .whitespacesAndNewlines),
+            notificationsEnabled: notificationsEnabled,
+            launchAtLogin: launchAtLogin,
+            prefersDarkMode: prefersDarkMode,
+            userID: (try? AppGroupStorage.shared.loadSettings())?.userID,
+            defaultBrushWidth: defaultBrushWidth,
+            defaultColor: defaultColor
+        )
+        try? AppGroupStorage.shared.saveSettings(settings)
+
+        canvasViewModel.brushWidth = defaultBrushWidth
+        canvasViewModel.selectedColor = defaultColor
+
+        NSApp.appearance = prefersDarkMode
+            ? NSAppearance(named: .darkAqua)
+            : nil
+
+        applyLaunchAtLogin(launchAtLogin)
+
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showSavedIndicator = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showSavedIndicator = false
+            }
+        }
+    }
+
+    private func applyLaunchAtLogin(_ enabled: Bool) {
+        if #available(macOS 13.0, *) {
+            try? SMAppService.mainApp.register()
+            if !enabled {
+                try? SMAppService.mainApp.unregister()
+            }
+        }
     }
 }

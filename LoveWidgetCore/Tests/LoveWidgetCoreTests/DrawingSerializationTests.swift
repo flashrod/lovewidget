@@ -48,8 +48,9 @@ struct DrawingSerializationTests {
 
     @Test("DrawingPoint Equatable")
     func drawingPointEquatable() {
-        let a = DrawingPoint(x: 1, y: 2)
-        let b = DrawingPoint(x: 1, y: 2)
+        let ts = Date()
+        let a = DrawingPoint(x: 1, y: 2, timestamp: ts)
+        let b = DrawingPoint(x: 1, y: 2, timestamp: ts)
         #expect(a == b)
     }
 
@@ -310,8 +311,9 @@ struct DrawingSerializationTests {
 
     @Test("Drawing Equatable")
     func drawingEquatable() {
-        let a = Drawing(strokes: [], version: 0)
-        let b = Drawing(strokes: [], version: 0)
+        let ts = Date()
+        let a = Drawing(strokes: [], updatedAt: ts, version: 0)
+        let b = Drawing(strokes: [], updatedAt: ts, version: 0)
         #expect(a == b)
     }
 }

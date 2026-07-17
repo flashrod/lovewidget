@@ -1,5 +1,29 @@
 import Foundation
 import Supabase
+import Auth
+
+// MARK: - UserDefaults Auth Storage
+
+/// Stores Supabase auth sessions in `UserDefaults` instead of the keychain.
+///
+/// This avoids the macOS sandbox keychain prompt
+/// ("LoveWidget wants to use your confidential info stored in SupabaseGotrue").
+final class UserDefaultsAuthStorage: @unchecked Sendable, AuthLocalStorage {
+    private let defaults = UserDefaults.standard
+    private let prefix = "com.lovewidget.auth."
+
+    func store(key: String, value: Data) throws {
+        defaults.set(value, forKey: prefix + key)
+    }
+
+    func retrieve(key: String) throws -> Data? {
+        defaults.data(forKey: prefix + key)
+    }
+
+    func remove(key: String) throws {
+        defaults.removeObject(forKey: prefix + key)
+    }
+}
 
 // MARK: - SupabaseConfigurationError
 
@@ -81,7 +105,12 @@ public actor SupabaseClientActor {
     public init(configuration: SupabaseConfiguration) {
         self.client = SupabaseClient(
             supabaseURL: configuration.url,
-            supabaseKey: configuration.anonKey
+            supabaseKey: configuration.anonKey,
+            options: SupabaseClientOptions(
+                auth: SupabaseClientOptions.AuthOptions(
+                    storage: UserDefaultsAuthStorage()
+                )
+            )
         )
         logger.info("SupabaseClient initialized for \(configuration.url.host ?? "unknown")")
     }

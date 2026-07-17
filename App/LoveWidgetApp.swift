@@ -9,6 +9,8 @@ struct LoveWidgetApp: App {
     @State private var canvasViewModel: CanvasViewModel
     @State private var syncEngine: SyncEngine?
     @State private var supabaseClient: SupabaseClientActor?
+    @State private var userRepo: UserRepository?
+    @State private var pairRepo: PairRepository?
     @State private var isConfigured = false
     @State private var configurationError: String?
 
@@ -26,7 +28,9 @@ struct LoveWidgetApp: App {
                     ContentView(
                         canvasViewModel: canvasViewModel,
                         syncEngine: syncEngine,
-                        supabaseClient: supabaseClient
+                        supabaseClient: supabaseClient,
+                        userRepo: userRepo,
+                        pairRepo: pairRepo
                     )
                 } else {
                     ProgressView("Setting up…")
@@ -50,8 +54,10 @@ struct LoveWidgetApp: App {
 
             let storage = AppGroupStorage.shared
             let drawingRepo = DrawingRepository(clientActor: client)
-            let _ = PairRepository(clientActor: client)
-            let _ = UserRepository(clientActor: client)
+            let pairRepo = PairRepository(clientActor: client)
+            let userRepo = UserRepository(clientActor: client)
+            self.pairRepo = pairRepo
+            self.userRepo = userRepo
             let conflictResolver = ConflictResolver()
 
             let engine = SyncEngine(

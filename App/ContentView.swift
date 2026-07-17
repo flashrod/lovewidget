@@ -15,13 +15,59 @@ enum AppNavigation: String, CaseIterable {
     }
 }
 
+struct OnboardingView: View {
+    @State private var displayName: String = ""
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "heart.fill")
+                .font(.system(size: 56))
+                .foregroundStyle(.red)
+
+            Text("Welcome to LoveWidget")
+                .font(.title2.weight(.semibold))
+
+            Text("Enter your display name so your partner can recognize you.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 20)
+
+            TextField("Your Name", text: $displayName)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 260)
+
+            Spacer()
+
+            Button("Continue") {
+                var settings = (try? AppGroupStorage.shared.loadSettings()) ?? AppUserSettings()
+                settings.displayName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+                settings.userID = settings.userID
+                try? AppGroupStorage.shared.saveSettings(settings)
+                dismiss()
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+            Spacer()
+        }
+        .frame(width: 380, height: 380)
+    }
+}
+
 struct ContentView: View {
 
     var canvasViewModel: CanvasViewModel
     let syncEngine: SyncEngine?
     let supabaseClient: SupabaseClientActor?
+    let userRepo: UserRepository?
+    let pairRepo: PairRepository?
     @State private var selectedNav: AppNavigation = .canvas
     @State private var sidebarVisible = true
+    @State private var showOnboarding = false
 
     var body: some View {
         HSplitView {
@@ -44,6 +90,13 @@ struct ContentView: View {
                     Image(systemName: "sidebar.left")
                 }
             }
+        }
+        .onAppear {
+            let settings = (try? AppGroupStorage.shared.loadSettings()) ?? AppUserSettings()
+            showOnboarding = !settings.isOnboardingComplete
+        }
+        .sheet(isPresented: $showOnboarding) {
+            OnboardingView()
         }
     }
 
@@ -123,7 +176,9 @@ struct ContentView: View {
             PairingView(
                 canvasViewModel: canvasViewModel,
                 syncEngine: syncEngine,
-                supabaseClient: supabaseClient
+                supabaseClient: supabaseClient,
+                userRepo: userRepo,
+                pairRepo: pairRepo
             )
         case .settings:
             SettingsView(canvasViewModel: canvasViewModel)

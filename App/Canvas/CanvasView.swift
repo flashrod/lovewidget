@@ -6,6 +6,7 @@ struct CanvasView: View {
     var viewModel: CanvasViewModel
     @State private var isDrawing: Bool = false
     @State private var showSentToast: Bool = false
+    @State private var showNoPairToast: Bool = false
 
     private let canvasSize: CGFloat = 320
 
@@ -42,6 +43,13 @@ struct CanvasView: View {
                         Text("Sent!")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            .transition(.opacity)
+                    }
+
+                    if let error = viewModel.lastSendError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.orange)
                             .transition(.opacity)
                     }
 
@@ -153,6 +161,11 @@ struct CanvasView: View {
                     reactions: viewModel.reactions,
                     onReact: { emoji in
                         viewModel.addReaction(emoji)
+                    },
+                    onDismissOldest: {
+                        if !viewModel.reactions.isEmpty {
+                            viewModel.reactions.removeFirst()
+                        }
                     }
                 )
             }
@@ -209,27 +222,58 @@ extension Color {
 }
 
 struct ReactionOverlay: View {
-    let reactions: [(String, Date)]
+    let reactions: [(emoji: String, date: Date)]
     let onReact: (String) -> Void
+    let onDismissOldest: () -> Void
 
     private let emojis = ["❤️", "😊", "🔥", "✨", "🥺"]
 
     var body: some View {
-        VStack {
-            Spacer()
-            HStack(spacing: 6) {
-                ForEach(emojis, id: \.self) { emoji in
-                    Button(emoji) {
-                        onReact(emoji)
-                    }
-                    .buttonStyle(.plain)
-                    .font(.system(size: 18))
-                    .padding(4)
-                    .background(Circle().fill(.ultraThinMaterial))
-                }
+        ZStack {
+            // Floating reactions
+            ForEach(Array(reactions.enumerated()), id: \.offset) { index, reaction in
+                Text(reaction.emoji)
+                    .font(.system(size: 24))
+                    .modifier(FloatingReaction(index: index, total: reactions.count))
             }
-            .padding(6)
-            .background(RoundedRectangle(cornerRadius: 20).fill(.ultraThinMaterial))
+
+            VStack {
+                Spacer()
+                // Send a reaction if at capacity
+                if reactions.count >= 10 {
+                    Button("✕") { onDismissOldest() }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                // Reaction buttons
+                HStack(spacing: 6) {
+                    ForEach(emojis, id: \.self) { emoji in
+                        Button(emoji) { onReact(emoji) }
+                            .buttonStyle(.plain)
+                            .font(.system(size: 18))
+                            .padding(4)
+                            .background(Circle().fill(.ultraThinMaterial))
+                    }
+                }
+                .padding(6)
+                .background(RoundedRectangle(cornerRadius: 20).fill(.ultraThinMaterial))
+            }
         }
+    }
+}
+
+struct FloatingReaction: ViewModifier {
+    let index: Int
+    let total: Int
+
+    func body(content: Content) -> some View {
+        let offsetX = CGFloat(index % 5 - 2) * 20
+        let offsetY = CGFloat(index / 5) * -30 - 10
+
+        content
+            .offset(x: offsetX, y: offsetY)
+            .transition(.scale.combined(with: .opacity))
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: index)
     }
 }

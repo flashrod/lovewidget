@@ -50,6 +50,9 @@ public final class CanvasViewModel {
     /// Local reactions to partner's drawing
     public var reactions: [(emoji: String, date: Date)] = []
 
+    /// Non-nil when the last send failed (cleared on next successful send)
+    public var lastSendError: String?
+
     // MARK: - Private
 
     private let engine: DrawingEngine
@@ -137,9 +140,16 @@ public final class CanvasViewModel {
 
     public func sendDrawing() {
         let capturedDrawing = drawing
-        guard let se = syncEngine else { return }
+        lastSendError = nil
+        guard let se = syncEngine else {
+            lastSendError = "Not connected"
+            return
+        }
         Task {
-            guard await se.hasPair else { return }
+            guard await se.hasPair else {
+                await MainActor.run { self.lastSendError = "Pair first in the Pair tab" }
+                return
+            }
             await se.submit(drawing: capturedDrawing)
             await MainActor.run {
                 WidgetCenter.shared.reloadAllTimelines()
