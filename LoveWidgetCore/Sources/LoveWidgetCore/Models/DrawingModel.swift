@@ -204,6 +204,36 @@ public struct Drawing: Codable, Sendable, Equatable {
     /// An empty drawing — use as initial state
     public static let empty = Drawing()
 
+    // MARK: - DrawingEntry
+
+    /// A single history entry for a sent or received drawing.
+    public struct Entry: Codable, Sendable, Identifiable, Equatable {
+        public let id: UUID
+        public let drawing: Drawing
+        public let authorName: String
+        public let type: EntryType
+        public let timestamp: Date
+
+        public enum EntryType: String, Codable, Sendable, Equatable {
+            case sent
+            case received
+        }
+
+        public init(
+            id: UUID = UUID(),
+            drawing: Drawing,
+            authorName: String,
+            type: EntryType,
+            timestamp: Date = Date()
+        ) {
+            self.id = id
+            self.drawing = drawing
+            self.authorName = authorName
+            self.type = type
+            self.timestamp = timestamp
+        }
+    }
+
     // MARK: - Mutations (return new values)
 
     /// Returns a new Drawing with the given stroke appended

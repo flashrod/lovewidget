@@ -4,12 +4,14 @@ import LoveWidgetCore
 enum AppNavigation: String, CaseIterable {
     case canvas   = "Canvas"
     case pair     = "Pair"
+    case history  = "History"
     case settings = "Settings"
 
     var icon: String {
         switch self {
         case .canvas:   return "pencil.and.outline"
         case .pair:     return "person.2.fill"
+        case .history:  return "clock.arrow.circlepath"
         case .settings: return "gearshape.fill"
         }
     }
@@ -180,6 +182,8 @@ struct ContentView: View {
                 userRepo: userRepo,
                 pairRepo: pairRepo
             )
+        case .history:
+            HistoryView()
         case .settings:
             SettingsView(canvasViewModel: canvasViewModel)
         }

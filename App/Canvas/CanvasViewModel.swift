@@ -152,6 +152,12 @@ public final class CanvasViewModel {
             }
             await se.submit(drawing: capturedDrawing)
             await MainActor.run {
+                let entry = Drawing.Entry(
+                    drawing: capturedDrawing,
+                    authorName: partnerName,
+                    type: .sent
+                )
+                try? AppGroupStorage.shared.appendHistory(entry)
                 WidgetCenter.shared.reloadAllTimelines()
             }
         }
@@ -169,6 +175,12 @@ public final class CanvasViewModel {
     public func applyRemoteDrawing(_ remote: Drawing) {
         partnerDrawing = remote
         lastSyncedAt = Date()
+        let entry = Drawing.Entry(
+            drawing: remote,
+            authorName: partnerName,
+            type: .received
+        )
+        try? AppGroupStorage.shared.appendHistory(entry)
         WidgetCenter.shared.reloadAllTimelines()
     }
 

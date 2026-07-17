@@ -135,8 +135,15 @@ public actor DrawingRepository {
                 LWLogger.network.info("Subscribed to drawing updates for pair \(pairID)")
 
                 for await action in stream {
-                    guard case .update(let update) = action else { continue }
-                    let record = update.record
+                    let record: [String: AnyJSON]
+                    switch action {
+                    case .insert(let insert):
+                        record = insert.record
+                    case .update(let update):
+                        record = update.record
+                    default:
+                        continue
+                    }
 
                     guard let createdByAny = record["created_by"],
                           case .string(let createdByString) = createdByAny,

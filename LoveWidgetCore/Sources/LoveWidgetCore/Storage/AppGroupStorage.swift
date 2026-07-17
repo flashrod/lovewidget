@@ -165,6 +165,29 @@ public final class AppGroupStorage: @unchecked Sendable {
         try delete(fileName: StorageKeys.pairFile)
     }
 
+    // MARK: - History
+
+    /// Load all drawing history entries.
+    public func loadHistory() throws -> [Drawing.Entry] {
+        try read([Drawing.Entry].self, from: StorageKeys.historyFile) ?? []
+    }
+
+    /// Append a new entry to the drawing history.
+    public func appendHistory(_ entry: Drawing.Entry) throws {
+        var history = try loadHistory()
+        history.append(entry)
+        // Keep max 100 entries to avoid unbounded growth
+        if history.count > 100 {
+            history = Array(history.suffix(100))
+        }
+        try write(history, to: StorageKeys.historyFile)
+    }
+
+    /// Clear all drawing history.
+    public func clearHistory() throws {
+        try delete(fileName: StorageKeys.historyFile)
+    }
+
     // MARK: - Pending Upload
 
     /// Load any failed upload queued for retry.

@@ -11,71 +11,61 @@ struct CanvasView: View {
     private let canvasSize: CGFloat = 320
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                canvasBackground
+        ScrollView(.vertical) {
+            VStack(spacing: 16) {
+                Text("Your Canvas")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.secondary)
 
-                VStack(spacing: 16) {
-                    Text("Your Canvas")
-                        .font(.system(size: 14, weight: .semibold))
+                drawingSurface
+                    .frame(width: canvasSize, height: canvasSize)
+
+                HStack(spacing: 12) {
+                    Button("Clear") {
+                        viewModel.clear()
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button("Send") {
+                        viewModel.sendDrawing()
+                        showSentToast = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            showSentToast = false
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+
+                if showSentToast {
+                    Text("Sent!")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
-
-                    drawingSurface
-                        .frame(width: canvasSize, height: canvasSize)
-
-                    HStack(spacing: 12) {
-                        Button("Clear") {
-                            viewModel.clear()
-                        }
-                        .buttonStyle(.bordered)
-
-                        Button("Send") {
-                            viewModel.sendDrawing()
-                            showSentToast = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                showSentToast = false
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-
-                    if showSentToast {
-                        Text("Sent!")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .transition(.opacity)
-                    }
-
-                    if let error = viewModel.lastSendError {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundStyle(.orange)
-                            .transition(.opacity)
-                    }
-
-                    if !viewModel.partnerDrawing.strokes.isEmpty {
-                        Divider()
-                        partnerSection
-                    }
+                        .transition(.opacity)
                 }
 
-                VStack {
-                    Spacer()
-                    DrawingToolbar(viewModel: viewModel)
-                        .padding(.bottom, 20)
+                if let error = viewModel.lastSendError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .transition(.opacity)
                 }
 
-                VStack {
-                    HStack {
-                        Spacer()
-                        ConnectionStatusBadge(status: viewModel.syncStatus)
-                            .padding(16)
-                    }
-                    Spacer()
-                }
+                Divider()
+
+                partnerSection
             }
+            .padding(24)
         }
-        .background(Color(nsColor: .windowBackgroundColor))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(canvasBackground)
+        .overlay(alignment: .topTrailing) {
+            ConnectionStatusBadge(status: viewModel.syncStatus)
+                .padding(16)
+        }
+        .overlay(alignment: .bottom) {
+            DrawingToolbar(viewModel: viewModel)
+                .padding(.bottom, 20)
+        }
     }
 
     private var canvasBackground: some View {
@@ -140,36 +130,65 @@ struct CanvasView: View {
 
     private var partnerSection: some View {
         VStack(spacing: 12) {
-            Text("Partner's Drawing")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.secondary)
+            HStack {
+                Text(viewModel.partnerName.isEmpty ? "Partner's Drawing" : "\(viewModel.partnerName)'s Drawing")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                if viewModel.lastSyncedAt != nil {
+                    Text("updated \(viewModel.lastSyncedAt?.formatted(date: .omitted, time: .shortened) ?? "")")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+            }
 
-            ZStack {
-                Canvas { context, size in
-                    for stroke in viewModel.partnerDrawing.strokes {
-                        renderStroke(stroke, in: context)
-                    }
+            if viewModel.partnerDrawing.strokes.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "square.dashed")
+                        .font(.system(size: 32))
+                        .foregroundStyle(.tertiary)
+                    Text("Waiting for partner's first drawing...")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
                 .frame(width: canvasSize * 0.6, height: canvasSize * 0.6)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white)
-                        .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+                        .stroke(Color.secondary.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [6]))
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.3))
+                        )
                 )
-
-                ReactionOverlay(
-                    reactions: viewModel.reactions,
-                    onReact: { emoji in
-                        viewModel.addReaction(emoji)
-                    },
-                    onDismissOldest: {
-                        if !viewModel.reactions.isEmpty {
-                            viewModel.reactions.removeFirst()
+            } else {
+                ZStack {
+                    Canvas { context, size in
+                        for stroke in viewModel.partnerDrawing.strokes {
+                            renderStroke(stroke, in: context)
                         }
                     }
-                )
+                    .frame(width: canvasSize * 0.6, height: canvasSize * 0.6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white)
+                            .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+                    )
+
+                    ReactionOverlay(
+                        reactions: viewModel.reactions,
+                        onReact: { emoji in
+                            viewModel.addReaction(emoji)
+                        },
+                        onDismissOldest: {
+                            if !viewModel.reactions.isEmpty {
+                                viewModel.reactions.removeFirst()
+                            }
+                        }
+                    )
+                }
             }
         }
+        .padding(.top, 8)
     }
 
     private func renderStroke(_ stroke: Stroke, in context: GraphicsContext, isActive: Bool = false) {
@@ -230,7 +249,6 @@ struct ReactionOverlay: View {
 
     var body: some View {
         ZStack {
-            // Floating reactions
             ForEach(Array(reactions.enumerated()), id: \.offset) { index, reaction in
                 Text(reaction.emoji)
                     .font(.system(size: 24))
@@ -239,14 +257,12 @@ struct ReactionOverlay: View {
 
             VStack {
                 Spacer()
-                // Send a reaction if at capacity
                 if reactions.count >= 10 {
                     Button("✕") { onDismissOldest() }
                         .buttonStyle(.plain)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                // Reaction buttons
                 HStack(spacing: 6) {
                     ForEach(emojis, id: \.self) { emoji in
                         Button(emoji) { onReact(emoji) }

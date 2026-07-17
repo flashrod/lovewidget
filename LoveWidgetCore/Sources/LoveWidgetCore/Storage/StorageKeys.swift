@@ -22,6 +22,8 @@ public enum StorageKeys {
     public static let settingsFile       = "settings.json"
     /// Active pair information
     public static let pairFile           = "pair.json"
+    /// History of sent and received drawings
+    public static let historyFile        = "drawing_history.json"
     /// A failed upload queued for retry
     public static let pendingUploadFile  = "pending_upload.json"
     /// Rotating application log file
