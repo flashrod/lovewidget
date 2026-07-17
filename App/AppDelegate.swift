@@ -9,7 +9,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        setupMenuBar()
+        // Defer status item setup to the next runloop so AppKit is fully ready.
+        DispatchQueue.main.async { [weak self] in
+            self?.setupMenuBar()
+        }
+
+        // Some systems can drop the first status item registration during launch.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.ensureMenuBarVisible()
+        }
+
         LWLogger.app.info("LoveWidget did finish launching.")
     }
 
@@ -25,18 +34,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupMenuBar() {
+        if statusItem != nil {
+            return
+        }
+
         statusItem = NSStatusBar.system.statusItem(
-            withLength: NSStatusItem.squareLength
+            withLength: NSStatusItem.variableLength
         )
 
         if let button = statusItem?.button {
-            button.image = NSImage(
+            let image = NSImage(
                 systemSymbolName: "heart.fill",
                 accessibilityDescription: "LoveWidget"
             )
+
+            if let image {
+                image.isTemplate = true
+                button.image = image
+                button.imagePosition = .imageOnly
+                button.title = ""
+            } else {
+                // Fallback label if SF Symbol rendering fails.
+                button.title = "LW"
+                button.image = nil
+            }
+
             button.action = #selector(togglePopover)
             button.target = self
+
+            if #available(macOS 10.12, *) {
+                statusItem?.isVisible = true
+            }
+
+            LWLogger.menuBar.info("Menu bar status item configured.")
+        } else {
+            LWLogger.menuBar.error("Failed to access menu bar status button.")
         }
+    }
+
+    private func ensureMenuBarVisible() {
+        guard statusItem?.button == nil else { return }
+        LWLogger.menuBar.warning("Status button missing after launch; rebuilding status item.")
+        statusItem = nil
+        setupMenuBar()
     }
 
     @objc private func togglePopover() {

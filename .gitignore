@@ -31,6 +31,7 @@ xcuserdata/
 # ========================
 DerivedData/
 build/
+.release/
 *.ipa
 *.dSYM.zip
 *.dSYM
@@ -85,3 +86,4 @@ logs/
 *.pem
 *.key
 .service_role_key
+partner_test.sh

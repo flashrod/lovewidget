@@ -64,6 +64,28 @@ open LoveWidget.app
 
 # Build a distributable DMG
 ./build-release.sh
+
+# Build DMG + compute checksum + update cask + create GitHub release
+./Scripts/release_homebrew.sh 1.0.1 --repo flashrod/LoveWidget
+```
+
+## Release Checklist (DMG + Homebrew)
+
+```bash
+# 1) Prepare release artifact and metadata
+./Scripts/release_homebrew.sh 1.0.1 --repo flashrod/LoveWidget
+
+# 2) Commit app repo changes (includes Casks/lovewidget.rb update)
+git add build-release.sh Casks/lovewidget.rb README.md Scripts/release_homebrew.sh
+git commit -m "release: v1.0.1"
+git push
+```
+
+Then update the same cask change in your tap repository (for example `flashrod/homebrew-tap`) and push there. Once pushed, users can install via Homebrew:
+
+```bash
+brew tap flashrod/tap
+brew install --cask lovewidget
 ```
 
 Requires Swift 6.0+, macOS 14+. No Xcode needed.

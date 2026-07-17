@@ -3,7 +3,7 @@ set -euo pipefail
 
 APP_NAME="LoveWidget"
 BUNDLE_ID="com.lovewidget.app"
-VERSION="1.0.0"
+VERSION="${1:-${VERSION:-1.0.0}}"
 CONFIG_FILE="Config.xcconfig"
 ENTITLEMENTS="LoveWidget.entitlements"
 
