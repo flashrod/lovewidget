@@ -12,8 +12,7 @@ public enum AppGroupStorageError: Error, LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .containerNotFound(let id):
-            return "App Group container not found for '\(id)'. " +
-                   "Verify the entitlements are configured correctly."
+            return "Container not found for '\(id)'."
         case .encodingFailed(let error):
             return "Encoding failed: \(error.localizedDescription)"
         case .writeFailed(let error):
@@ -44,6 +43,9 @@ public final class AppGroupStorage: @unchecked Sendable {
     private let decoder: JSONDecoder
     private let lock = NSLock()
 
+    /// The resolved container directory URL (App Group or sandbox fallback).
+    public private(set) var containerURL: URL
+
     // MARK: - Shared Instance
 
     /// The shared storage instance using the default App Group identifier.
@@ -62,22 +64,50 @@ public final class AppGroupStorage: @unchecked Sendable {
         let dec = JSONDecoder()
         dec.dateDecodingStrategy = .iso8601
         self.decoder = dec
+
+        self.containerURL = Self.resolveContainer(groupIdentifier: groupIdentifier)
     }
 
     // MARK: - Container
 
-    /// URL of the shared App Group container directory.
-    public func containerURL() throws -> URL {
-        guard let url = FileManager.default.containerURL(
+    /// Resolve the storage container URL once at init.
+    /// Tries the App Group container first; if it's not accessible
+    /// (ad-hoc signing, sandbox restrictions), falls back to the
+    /// app's sandbox Application Support / LoveWidget directory.
+    private static func resolveContainer(groupIdentifier: String) -> URL {
+        if let url = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: groupIdentifier
-        ) else {
-            throw AppGroupStorageError.containerNotFound(groupIdentifier: groupIdentifier)
+        ) {
+            var isDir: ObjCBool = false
+            let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir)
+            if exists, isDir.boolValue {
+                LWLogger.storage.info("Using App Group container: \(url.path)")
+                return url
+            }
+            LWLogger.storage.info("App Group container URL resolved but not accessible on disk — falling back.")
         }
+        let appSupport = FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        ).first!
+        // Use the standard directory for the real app, or derive from identifier
+        // for isolated instances (e.g. tests with unique identifiers).
+        let dirName: String
+        if groupIdentifier == StorageKeys.appGroupIdentifier {
+            dirName = "LoveWidget"
+        } else {
+            // Use a hash of the identifier to create unique per-instance directories
+            let suffix = abs(groupIdentifier.hashValue)
+            dirName = "LoveWidget-\(suffix)"
+        }
+        let url = appSupport.appendingPathComponent(dirName)
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        LWLogger.storage.info("Using app sandbox container: \(url.path)")
         return url
     }
 
-    private func fileURL(for name: String) throws -> URL {
-        try containerURL().appendingPathComponent(name)
+    private func fileURL(for name: String) -> URL {
+        containerURL.appendingPathComponent(name)
     }
 
     // MARK: - Generic Read / Write
@@ -86,13 +116,16 @@ public final class AppGroupStorage: @unchecked Sendable {
     public func write<T: Codable & Sendable>(_ value: T, to fileName: String) throws {
         lock.lock()
         defer { lock.unlock() }
-        let url = try fileURL(for: fileName)
+        let url = fileURL(for: fileName)
         do {
             let data = try encoder.encode(value)
             try data.write(to: url, options: .atomic)
         } catch let error as AppGroupStorageError {
             throw error
         } catch {
+            if error is EncodingError {
+                throw AppGroupStorageError.encodingFailed(error)
+            }
             throw AppGroupStorageError.writeFailed(error)
         }
     }
@@ -102,7 +135,7 @@ public final class AppGroupStorage: @unchecked Sendable {
     public func read<T: Codable & Sendable>(_ type: T.Type, from fileName: String) throws -> T? {
         lock.lock()
         defer { lock.unlock() }
-        let url = try fileURL(for: fileName)
+        let url = fileURL(for: fileName)
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         do {
             let data = try Data(contentsOf: url)
@@ -119,7 +152,7 @@ public final class AppGroupStorage: @unchecked Sendable {
     public func delete(fileName: String) throws {
         lock.lock()
         defer { lock.unlock() }
-        let url = try fileURL(for: fileName)
+        let url = fileURL(for: fileName)
         guard FileManager.default.fileExists(atPath: url.path) else { return }
         try FileManager.default.removeItem(at: url)
     }
@@ -214,16 +247,16 @@ public final class AppGroupStorage: @unchecked Sendable {
     public func appendLog(_ message: String) {
         lock.lock()
         defer { lock.unlock() }
-        guard let url = try? fileURL(for: StorageKeys.logsFile) else { return }
+        let url = fileURL(for: StorageKeys.logsFile)
         let formatted = "[\(Date().formatted(.iso8601))] \(message)\n"
         guard let data = formatted.data(using: .utf8) else { return }
 
         if FileManager.default.fileExists(atPath: url.path),
            let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
            let size = attrs[.size] as? Int,
-           size > StorageKeys.maxLogFileSizeBytes,
-           let rotated = try? fileURL(for: StorageKeys.logsRotatedFile) {
-            try? FileManager.default.replaceItemAt(rotated, withItemAt: url)
+           size > StorageKeys.maxLogFileSizeBytes {
+            let rotated = fileURL(for: StorageKeys.logsRotatedFile)
+            _ = try? FileManager.default.replaceItemAt(rotated, withItemAt: url)
         }
 
         if FileManager.default.fileExists(atPath: url.path) {
@@ -240,8 +273,8 @@ public final class AppGroupStorage: @unchecked Sendable {
     public func readLogs() -> String {
         lock.lock()
         defer { lock.unlock() }
-        guard let url = try? fileURL(for: StorageKeys.logsFile),
-              let data = try? Data(contentsOf: url),
+        let url = fileURL(for: StorageKeys.logsFile)
+        guard let data = try? Data(contentsOf: url),
               let text = String(data: data, encoding: .utf8) else {
             return "(no logs)"
         }

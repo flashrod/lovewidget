@@ -52,6 +52,38 @@ struct PairingView: View {
             displayName = settings.displayName
         }
         pairState = try? AppGroupStorage.shared.loadPair()
+        if pairState == nil {
+            Task { await restorePairFromSupabase() }
+        }
+    }
+
+    private func restorePairFromSupabase() async {
+        guard let pairRepo else { return }
+        do {
+            try await supabaseClient?.ensureAuthenticated()
+            guard let userID = try await userRepo?.createOrFetchUser(
+                name: displayName.isEmpty ? "Me" : displayName,
+                deviceID: DeviceIdentifier.current
+            ).id else { return }
+            guard let pair = try await pairRepo.fetchPair(for: userID) else { return }
+            let partner: AppUser?
+            if let partnerID = pair.userTwoID {
+                partner = try? await userRepo?.fetchUser(id: partnerID)
+            } else {
+                partner = nil
+            }
+            let localState = PairLocalState(
+                pairID: pair.id,
+                partnerID: pair.userTwoID,
+                partnerName: partner?.name,
+                inviteCode: pair.inviteCode
+            )
+            try? AppGroupStorage.shared.savePair(localState)
+            await MainActor.run { self.pairState = localState }
+            if pair.userTwoID != nil {
+                await syncEngine?.start(pairID: pair.id, userID: userID)
+            }
+        } catch {}
     }
 
     private func startPollingIfNeeded() {
@@ -235,7 +267,22 @@ struct PairingView: View {
                 currentUser = user
                 saveUserSettings(userID: user.id)
 
-                let pair = try await pairRepo.createPair(userOneID: user.id)
+                let pair: Pair
+                if let existing = try await pairRepo.fetchPair(for: user.id) {
+                    pair = existing
+                } else {
+                    do {
+                        pair = try await pairRepo.createPair(userOneID: user.id)
+                    } catch {
+                        // If create fails (e.g. unique constraint from stale row),
+                        // retry fetch — the pair may now be visible
+                        if let recovered = try await pairRepo.fetchPair(for: user.id) {
+                            pair = recovered
+                        } else {
+                            throw error
+                        }
+                    }
+                }
                 currentPair = pair
 
                 let localState = PairLocalState(
@@ -244,14 +291,19 @@ struct PairingView: View {
                     partnerName: nil,
                     inviteCode: pair.inviteCode
                 )
-                try AppGroupStorage.shared.savePair(localState)
-                pairState = localState
-                generatedCode = pair.inviteCode
-                startPollingIfNeeded()
+                // Best-effort save — don't let storage failure break pairing
+                try? AppGroupStorage.shared.savePair(localState)
+                await MainActor.run {
+                    self.pairState = localState
+                    self.generatedCode = pair.inviteCode
+                    self.startPollingIfNeeded()
+                }
             } catch {
-                errorMessage = error.localizedDescription
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                }
             }
-            isCreating = false
+            await MainActor.run { self.isCreating = false }
         }
     }
 
@@ -292,15 +344,20 @@ struct PairingView: View {
                     partnerName: partnerName,
                     inviteCode: pair.inviteCode
                 )
-                try AppGroupStorage.shared.savePair(localState)
-                pairState = localState
-                canvasViewModel.partnerName = partnerName ?? "Your Partner"
+                // Best-effort save — don't let storage failure break pairing
+                try? AppGroupStorage.shared.savePair(localState)
+                await MainActor.run {
+                    self.pairState = localState
+                    self.canvasViewModel.partnerName = partnerName ?? "Your Partner"
+                }
 
                 await syncEngine?.start(pairID: pair.id, userID: user.id)
             } catch {
-                errorMessage = error.localizedDescription
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                }
             }
-            isJoining = false
+            await MainActor.run { self.isJoining = false }
         }
     }
 
@@ -359,7 +416,11 @@ struct PairingView: View {
         if let pairRepo, let pair = pairState {
             try? await pairRepo.deletePair(id: pair.pairID)
         }
+        // Best-effort storage cleanup (may fail for ad-hoc sandbox)
         try? AppGroupStorage.shared.clearPair()
+        try? AppGroupStorage.shared.clearHistory()
+        try? AppGroupStorage.shared.clearPendingUpload()
+        // Always clear in-memory state regardless of disk failures
         pairState = nil
         generatedCode = nil
         inviteCode = ""
@@ -367,6 +428,8 @@ struct PairingView: View {
         currentPair = nil
         canvasViewModel.partnerName = ""
         errorMessage = nil
+        // Force sync status update so UI shows idle immediately
+        canvasViewModel.syncStatus = .idle
     }
 
     private func saveUserSettings(userID: UUID) {

@@ -201,6 +201,12 @@ public struct Drawing: Codable, Sendable, Equatable {
         self.version = version
     }
 
+    public var boundingBox: CGRect {
+        guard !strokes.isEmpty else { return .zero }
+        let union = strokes.map(\.boundingBox).reduce(CGRect.null) { $0.union($1) }
+        return union.isNull ? .zero : union
+    }
+
     /// An empty drawing — use as initial state
     public static let empty = Drawing()
 

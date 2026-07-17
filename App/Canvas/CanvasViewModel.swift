@@ -129,6 +129,9 @@ public final class CanvasViewModel {
         canUndo = engine.canUndo
         canRedo = engine.canRedo
         syncDrawingFromEngine()
+        try? AppGroupStorage.shared.saveDrawing(drawing)
+        WidgetCenter.shared.reloadAllTimelines()
+        Task { await syncEngine?.submit(drawing: drawing) }
     }
 
     public func resetZoom() {

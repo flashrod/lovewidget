@@ -238,7 +238,7 @@ public actor SyncEngine {
         guard let pairID else { return }
         do {
             let remote = try await drawingRepo.fetchDrawing(pairID: pairID)
-            if remote.version > currentDrawing.version {
+            if remote != .empty {
                 await handleRemoteDrawing(remote)
             } else {
                 setStatus(.connected)
@@ -271,8 +271,7 @@ public actor SyncEngine {
         // WidgetCenter is available only in the app target (not SPM package),
         // so we signal via UserDefaults that the widget should refresh.
         // The App target reads this and calls WidgetCenter.shared.reloadAllTimelines().
-        let defaults = UserDefaults(suiteName: StorageKeys.appGroupIdentifier)
-        defaults?.set(true, forKey: StorageKeys.widgetNeedsRefreshKey)
+        StorageKeys.userDefaults().set(true, forKey: StorageKeys.widgetNeedsRefreshKey)
     }
 
     // MARK: - Status

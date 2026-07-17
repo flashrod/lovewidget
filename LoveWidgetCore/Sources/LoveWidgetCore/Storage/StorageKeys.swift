@@ -31,7 +31,14 @@ public enum StorageKeys {
     /// Old log file after rotation
     public static let logsRotatedFile    = "logs_old.txt"
 
-    // MARK: - UserDefaults Keys (App Group suite)
+    // MARK: - UserDefaults
+
+    /// Returns a UserDefaults instance, preferring the App Group suite
+    /// (for widget sharing) but falling back to standard when ad-hoc
+    /// signing prevents App Group access.
+    public static func userDefaults() -> UserDefaults {
+        UserDefaults(suiteName: appGroupIdentifier) ?? .standard
+    }
 
     /// ISO8601 string of the last successful sync timestamp
     public static let lastSyncTimestampKey = "lw.lastSyncTimestamp"

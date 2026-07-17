@@ -96,7 +96,6 @@ struct LoveWidget: Widget {
 
 // MARK: - WidgetBundle
 
-@main
 struct LoveWidgetBundle: WidgetBundle {
     var body: some Widget {
         LoveWidget()

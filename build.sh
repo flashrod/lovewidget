@@ -24,7 +24,8 @@ echo ""
 echo "==> Building with SwiftPM..."
 $SWIFT build -c release
 
-EXECUTABLE_PATH=$($SWIFT build -c release --show-bin-path)/$PRODUCT_NAME
+BIN_PATH=$($SWIFT build -c release --show-bin-path)
+EXECUTABLE_PATH="$BIN_PATH/$PRODUCT_NAME"
 echo "  Executable: $EXECUTABLE_PATH"
 
 echo ""
@@ -89,4 +90,7 @@ echo "  Run: open $APP_BUNDLE"
 echo ""
 echo "  (The app runs in the menu bar."
 echo "   Click the heart icon -> Show LoveWidget)"
+echo ""
+echo "  Note: Widget extension (WidgetExtension/) requires Xcode to build."
+echo "  Open Package.swift in Xcode and build the LoveWidgetExtension target."
 echo ""

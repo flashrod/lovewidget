@@ -1,11 +1,12 @@
 import AppKit
+import SwiftUI
 import LoveWidgetCore
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusItem: NSStatusItem?
-    private var statusMenu: NSMenu?
+    private var popover: NSPopover?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMenuBar()
@@ -33,28 +34,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 systemSymbolName: "heart.fill",
                 accessibilityDescription: "LoveWidget"
             )
+            button.action = #selector(togglePopover)
+            button.target = self
         }
-
-        statusMenu = NSMenu()
-        statusMenu?.addItem(
-            withTitle: "Show LoveWidget",
-            action: #selector(showWindow),
-            keyEquivalent: ""
-        )
-        statusMenu?.addItem(.separator())
-        statusMenu?.addItem(
-            withTitle: "Quit",
-            action: #selector(NSApplication.terminate(_:)),
-            keyEquivalent: "q"
-        )
-
-        statusItem?.menu = statusMenu
     }
 
-    @objc private func showWindow() {
-        NSApp.activate(ignoringOtherApps: true)
-        if let window = NSApp.windows.first {
-            window.makeKeyAndOrderFront(nil)
+    @objc private func togglePopover() {
+        guard let button = statusItem?.button else { return }
+
+        if let popover, popover.isShown {
+            popover.performClose(nil)
+            return
+        }
+
+        if popover == nil {
+            let contentView = MenuBarPopoverView(onClose: { [weak self] in
+                self?.popover?.performClose(nil)
+            })
+            let hostingController = NSHostingController(rootView: contentView)
+            let newPopover = NSPopover()
+            newPopover.contentSize = NSSize(width: 240, height: 320)
+            newPopover.behavior = .transient
+            newPopover.contentViewController = hostingController
+            popover = newPopover
+        }
+
+        popover?.show(
+            relativeTo: button.bounds,
+            of: button,
+            preferredEdge: .minY
+        )
+
+        if let popoverWindow = popover?.contentViewController?.view.window {
+            popoverWindow.makeKey()
         }
     }
 
@@ -85,5 +97,3 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         button.contentTintColor = tintColor
     }
 }
-
-

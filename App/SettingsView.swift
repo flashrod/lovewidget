@@ -108,6 +108,7 @@ struct SettingsView: View {
         displayName = settings.displayName
         notificationsEnabled = settings.notificationsEnabled
         launchAtLogin = settings.launchAtLogin
+        previousLaunchAtLogin = settings.launchAtLogin
         prefersDarkMode = settings.prefersDarkMode
         defaultBrushWidth = settings.defaultBrushWidth
         defaultColor = settings.defaultColor
@@ -144,7 +145,11 @@ struct SettingsView: View {
         }
     }
 
+    @State private var previousLaunchAtLogin: Bool?
+
     private func applyLaunchAtLogin(_ enabled: Bool) {
+        guard enabled != previousLaunchAtLogin else { return }
+        previousLaunchAtLogin = enabled
         if #available(macOS 13.0, *) {
             do {
                 if enabled {

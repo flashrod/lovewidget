@@ -16,6 +16,18 @@ let package = Package(
                 .product(name: "LoveWidgetCore", package: "LoveWidgetCore"),
             ],
             path: "App",
+            exclude: ["Info.plist"],
+            swiftSettings: [
+                .unsafeFlags(["-strict-concurrency=complete"]),
+            ]
+        ),
+        .executableTarget(
+            name: "LoveWidgetExtension",
+            dependencies: [
+                .product(name: "LoveWidgetCore", package: "LoveWidgetCore"),
+            ],
+            path: "WidgetExtension",
+            exclude: ["Info.plist"],
             swiftSettings: [
                 .unsafeFlags(["-strict-concurrency=complete"]),
             ]

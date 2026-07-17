@@ -229,17 +229,6 @@ struct CanvasView: View {
     }
 }
 
-extension Color {
-    init(_ strokeColor: StrokeColor) {
-        self.init(
-            red: strokeColor.red,
-            green: strokeColor.green,
-            blue: strokeColor.blue,
-            opacity: strokeColor.alpha
-        )
-    }
-}
-
 struct ReactionOverlay: View {
     let reactions: [(emoji: String, date: Date)]
     let onReact: (String) -> Void

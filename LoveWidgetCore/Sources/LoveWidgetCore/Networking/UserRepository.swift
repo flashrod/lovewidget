@@ -67,25 +67,51 @@ public actor UserRepository {
 
     /// Fetch the user record for this device, creating one if it doesn't exist.
     ///
+    /// Uses the `upsert_user` SECURITY DEFINER Postgres function (migration 004)
+    /// so that the user's `id` always matches the current `auth.uid()` even when
+    /// the anonymous auth session is re-created (different `auth.uid()`, same device).
+    ///
+    /// If the `upsert_user` function has not yet been applied to the Supabase project,
+    /// falls back to a direct INSERT (which may fail with a device_id uniqueness error
+    /// if a stale user record exists — apply migration 004 to resolve permanently).
+    ///
     /// - Parameters:
     ///   - name: Display name (only used during creation; ignored on subsequent calls)
     ///   - deviceID: Stable hardware UUID for this device
     /// - Returns: The fetched or newly created `AppUser`
     public func createOrFetchUser(name: String, deviceID: String) async throws -> AppUser {
-        // Ensure we're authenticated so auth.uid() is valid
         try await clientActor.ensureAuthenticated()
 
         guard let authUserID = await clientActor.authenticatedUserID else {
             throw UserRepositoryError.unauthenticated
         }
 
-        // Try to fetch by device_id first (handles reinstall or new device)
-        if let existing = try await fetchUser(by: deviceID) {
+        // Try using the SECURITY DEFINER upsert function (migration 004)
+        // to keep the user's id in sync with auth.uid(), bypassing RLS.
+        do {
+            let row: UserRow = try await clientActor.supabase
+                .rpc("upsert_user", params: [
+                    "p_id": authUserID.uuidString,
+                    "p_name": name,
+                    "p_device_id": deviceID,
+                ])
+                .select()
+                .single()
+                .execute()
+                .value
+            logger.info("Upserted user: \(row.id)")
+            return row.toAppUser()
+        } catch {
+            // Function not available — fall back to fetch-or-insert
+            logger.warning("upsert_user RPC failed (\(error.localizedDescription)) — falling back to INSERT.")
+        }
+
+        // Fallback: try fetching by device_id, then insert if missing
+        if let existing = try? await fetchUser(by: deviceID) {
             logger.info("Found existing user: \(existing.id)")
             return existing
         }
 
-        // Create new user record
         let insert = UserInsert(id: authUserID, name: name, device_id: deviceID)
         let row: UserRow = try await clientActor.supabase
             .from("users")
