@@ -146,9 +146,14 @@ struct SettingsView: View {
 
     private func applyLaunchAtLogin(_ enabled: Bool) {
         if #available(macOS 13.0, *) {
-            try? SMAppService.mainApp.register()
-            if !enabled {
-                try? SMAppService.mainApp.unregister()
+            do {
+                if enabled {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
+                }
+            } catch {
+                LWLogger.app.warning("Launch at login: \(error.localizedDescription)")
             }
         }
     }
