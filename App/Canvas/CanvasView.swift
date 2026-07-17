@@ -98,12 +98,12 @@ struct CanvasView: View {
     }
 
     private var drawingSurface: some View {
-        Canvas { context, canvasSize in
+        Canvas { context, _ in
             for stroke in viewModel.drawing.strokes {
-                renderStroke(stroke, in: context)
+                StrokeRenderer.render(stroke, in: context)
             }
             if let active = viewModel.activeStroke, active.points.count >= 2 {
-                renderStroke(active, in: context, isActive: true)
+                StrokeRenderer.render(active, in: context)
             }
         }
         .background(
@@ -151,7 +151,7 @@ struct CanvasView: View {
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
-                .frame(width: canvasSize * 0.6, height: canvasSize * 0.6)
+                .frame(width: canvasSize, height: canvasSize)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.secondary.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [6]))
@@ -161,13 +161,13 @@ struct CanvasView: View {
                         )
                 )
             } else {
-                ZStack {
-                    Canvas { context, size in
+                VStack(spacing: 8) {
+                    Canvas { context, _ in
                         for stroke in viewModel.partnerDrawing.strokes {
-                            renderStroke(stroke, in: context)
+                            StrokeRenderer.render(stroke, in: context)
                         }
                     }
-                    .frame(width: canvasSize * 0.6, height: canvasSize * 0.6)
+                    .frame(width: canvasSize, height: canvasSize)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.white)
@@ -191,42 +191,6 @@ struct CanvasView: View {
         .padding(.top, 8)
     }
 
-    private func renderStroke(_ stroke: Stroke, in context: GraphicsContext, isActive: Bool = false) {
-        guard stroke.points.count >= 2 else {
-            if let point = stroke.points.first {
-                let dotRect = CGRect(
-                    x: point.x - stroke.width / 2,
-                    y: point.y - stroke.width / 2,
-                    width: stroke.width,
-                    height: stroke.width
-                )
-                context.fill(
-                    Path(ellipseIn: dotRect),
-                    with: .color(Color(stroke.color).opacity(stroke.opacity))
-                )
-            }
-            return
-        }
-
-        let cgPath = SplineSmoothing.path(from: stroke.points)
-        let path = Path(cgPath)
-
-        var copy = context
-        copy.opacity = stroke.opacity
-        copy.stroke(
-            path,
-            with: .color(Color(stroke.color)),
-            style: StrokeStyle(lineWidth: stroke.width, lineCap: .round, lineJoin: .round)
-        )
-
-        if isActive {
-            copy.stroke(
-                path,
-                with: .color(Color(stroke.color).opacity(0.15)),
-                style: StrokeStyle(lineWidth: stroke.width * 2.5, lineCap: .round, lineJoin: .round)
-            )
-        }
-    }
 }
 
 struct ReactionOverlay: View {

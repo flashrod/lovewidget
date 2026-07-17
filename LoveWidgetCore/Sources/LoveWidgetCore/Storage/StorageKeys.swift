@@ -16,8 +16,10 @@ public enum StorageKeys {
 
     // MARK: - File Names
 
-    /// The current shared drawing canvas
+    /// The current user's own drawing canvas
     public static let drawingFile        = "drawing.json"
+    /// The partner's drawing (received via sync)
+    public static let partnerDrawingFile = "partner_drawing.json"
     /// User preferences and session info
     public static let settingsFile       = "settings.json"
     /// Active pair information
@@ -44,6 +46,8 @@ public enum StorageKeys {
     public static let lastSyncTimestampKey = "lw.lastSyncTimestamp"
     /// Bool: whether the widget needs a timeline refresh
     public static let widgetNeedsRefreshKey = "lw.widgetNeedsRefresh"
+    /// JSON-encoded partner drawing data for menu bar access (reliable across sandbox)
+    public static let partnerDrawingDataKey = "lw.partnerDrawingData"
 
     // MARK: - Limits
 

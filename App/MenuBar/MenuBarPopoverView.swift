@@ -86,7 +86,7 @@ struct MenuBarPopoverView: View {
     }
 
     private func refresh() {
-        drawing = (try? storage.loadDrawing()) ?? .empty
+        drawing = (try? storage.loadPartnerDrawing()) ?? .empty
         let pair = try? storage.loadPair()
         partnerName = pair?.partnerDisplayName ?? ""
         lastUpdated = StorageKeys.userDefaults().object(forKey: StorageKeys.lastSyncTimestampKey) as? Date
@@ -113,33 +113,7 @@ struct DrawingPreview: View {
 
     var body: some View {
         Canvas { context, size in
-            let scale = min(
-                size.width / max(drawing.boundingBox.width, 1),
-                size.height / max(drawing.boundingBox.height, 1)
-            )
-            let offsetX = (size.width - drawing.boundingBox.width * scale) / 2
-            let offsetY = (size.height - drawing.boundingBox.height * scale) / 2
-
-            context.translateBy(x: offsetX, y: offsetY)
-            context.scaleBy(x: scale, y: scale)
-
-            for stroke in drawing.strokes {
-                var path = Path()
-                guard let first = stroke.points.first else { continue }
-                path.move(to: CGPoint(x: first.x, y: first.y))
-                for point in stroke.points.dropFirst() {
-                    path.addLine(to: CGPoint(x: point.x, y: point.y))
-                }
-                context.stroke(
-                    path,
-                    with: .color(Color(stroke.color).opacity(stroke.opacity)),
-                    style: StrokeStyle(
-                        lineWidth: max(1, stroke.width * scale),
-                        lineCap: .round,
-                        lineJoin: .round
-                    )
-                )
-            }
+            StrokeRenderer.renderAll(drawing, in: context, size: size)
         }
         .background(Color.black.opacity(0.05))
         .clipShape(RoundedRectangle(cornerRadius: 8))

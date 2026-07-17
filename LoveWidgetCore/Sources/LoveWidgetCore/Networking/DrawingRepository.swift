@@ -83,6 +83,26 @@ public actor DrawingRepository {
         return row.drawing_json
     }
 
+    /// Fetch the latest drawing for a pair, including the `created_by` author.
+    /// Returns `nil` if no drawing has been uploaded yet.
+    public func fetchDrawingWithAuthor(pairID: UUID) async throws -> (Drawing, createdBy: UUID)? {
+        let rows: [DrawingRow] = try await clientActor.supabase
+            .from("drawings")
+            .select()
+            .eq("pair_id", value: pairID.uuidString)
+            .limit(1)
+            .execute()
+            .value
+
+        guard let row = rows.first else {
+            logger.info("No drawing yet for pair \(pairID) — using empty canvas.")
+            return nil
+        }
+
+        logger.debug("Fetched drawing v\(row.drawing_json.version) for pair \(pairID), created by \(row.created_by)")
+        return (row.drawing_json, row.created_by)
+    }
+
     /// Upsert the full drawing to Supabase.
     ///
     /// Uses `onConflict: "pair_id"` so a second upload for the same pair

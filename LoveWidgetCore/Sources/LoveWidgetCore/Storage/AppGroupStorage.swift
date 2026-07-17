@@ -159,14 +159,43 @@ public final class AppGroupStorage: @unchecked Sendable {
 
     // MARK: - Drawing
 
-    /// Load the current shared drawing, returning `.empty` if none is saved.
+    /// Load the current user's own drawing, returning `.empty` if none is saved.
     public func loadDrawing() throws -> Drawing {
         try read(Drawing.self, from: StorageKeys.drawingFile) ?? .empty
     }
 
-    /// Atomically persist the current shared drawing.
+    /// Atomically persist the current user's own drawing.
     public func saveDrawing(_ drawing: Drawing) throws {
         try write(drawing, to: StorageKeys.drawingFile)
+    }
+
+    /// Load the partner's drawing (received via sync), returning `.empty` if none.
+    public func loadPartnerDrawing() throws -> Drawing {
+        if let drawing = try? read(Drawing.self, from: StorageKeys.partnerDrawingFile) {
+            return drawing
+        }
+        // Fallback: read from UserDefaults (more reliable in ad-hoc sandbox)
+        if let data = StorageKeys.userDefaults().data(forKey: StorageKeys.partnerDrawingDataKey),
+           let drawing = try? decoder.decode(Drawing.self, from: data) {
+            return drawing
+        }
+        return .empty
+    }
+
+    /// Atomically persist the partner's drawing.
+    public func savePartnerDrawing(_ drawing: Drawing) throws {
+        // Best-effort file write (may fail in ad-hoc sandbox)
+        try? write(drawing, to: StorageKeys.partnerDrawingFile)
+        // UserDefaults always works — this is the reliable path for menu bar
+        if let data = try? encoder.encode(drawing) {
+            StorageKeys.userDefaults().set(data, forKey: StorageKeys.partnerDrawingDataKey)
+        }
+    }
+
+    /// Remove the partner drawing (called on "Reset Pair").
+    public func clearPartnerDrawing() throws {
+        try delete(fileName: StorageKeys.partnerDrawingFile)
+        StorageKeys.userDefaults().removeObject(forKey: StorageKeys.partnerDrawingDataKey)
     }
 
     // MARK: - Settings

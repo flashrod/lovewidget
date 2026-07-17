@@ -19,19 +19,26 @@ struct PairingView: View {
     @State private var currentUser: AppUser?
     @State private var currentPair: Pair?
     @State private var pollTask: Task<Void, Never>?
+    @State private var selectedMode: PairMode = .create
+    @State private var waitingHeartPulse = false
+    @State private var pairedAnimating = false
+
+    enum PairMode: String, CaseIterable {
+        case create = "Create"
+        case join   = "Join"
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            header
-
-            Divider()
-
             if let pair = pairState, pair.isPaired {
                 pairedView(pair)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             } else if let code = generatedCode, pairState != nil {
                 waitingView(code)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             } else {
-                pairingOptions
+                unpairedView
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -44,6 +51,8 @@ struct PairingView: View {
             pollTask?.cancel()
             pollTask = nil
         }
+        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: pairState?.isPaired)
+        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: generatedCode)
     }
 
     private func loadExistingState() {
@@ -92,108 +101,191 @@ struct PairingView: View {
         pollTask = Task { await pollForPartner() }
     }
 
-    private var header: some View {
-        HStack {
-            Image(systemName: "person.2.fill")
-                .font(.system(size: 16))
-                .foregroundStyle(Color.accentColor)
-            Text("Pair")
-                .font(.system(size: 15, weight: .semibold))
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-    }
+    // MARK: - Unpaired View
 
-    private var pairingOptions: some View {
-        HStack(spacing: 24) {
-            joinSection
-            Divider()
-                .frame(width: 1)
-            createSection
-        }
-        .padding(24)
-    }
+    private var unpairedView: some View {
+        VStack(spacing: 0) {
+            headerArea
 
-    private var joinSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Join a Pair")
-                .font(.system(size: 14, weight: .semibold))
-
-            TextField("Invite Code (XXX-XXXX)", text: $inviteCode)
-                .textFieldStyle(.roundedBorder)
-                .font(.system(size: 13, design: .monospaced))
-
-            TextField("Your Name", text: $displayName)
-                .textFieldStyle(.roundedBorder)
-
-            Button(action: joinPair) {
-                if isJoining {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                } else {
-                    Text("Join")
-                        .frame(maxWidth: .infinity)
+            Picker("Mode", selection: $selectedMode) {
+                ForEach(PairMode.allCases, id: \.self) { mode in
+                    Text(mode.rawValue).tag(mode)
                 }
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(isJoining || inviteCode.isEmpty || displayName.isEmpty)
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 48)
+            .padding(.bottom, 28)
+
+            switch selectedMode {
+            case .create:
+                createSection
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            case .join:
+                joinSection
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+            }
+
+            Spacer()
+        }
+        .frame(maxWidth: 420)
+    }
+
+    private var headerArea: some View {
+        VStack(spacing: 6) {
+            Image(systemName: "heart.fill")
+                .font(.system(size: 28))
+                .foregroundStyle(.pink)
+
+            Text("Connect")
+                .font(.system(size: 22, weight: .semibold))
+
+            Text("Share a canvas with your partner")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.top, 36)
+        .padding(.bottom, 24)
+    }
+
+    // MARK: - Create Section
+
+    private var createSection: some View {
+        VStack(spacing: 20) {
+            formCard {
+                Image(systemName: "square.and.arrow.up.fill")
+                    .font(.system(size: 36))
+                    .foregroundStyle(.pink)
+
+                Text("Create a pair code")
+                    .font(.system(size: 15, weight: .medium))
+
+                Text("Share this code with your partner so they can join your canvas.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                TextField("Your Name", text: $displayName)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(size: 13))
+
+                Button(action: createPair) {
+                    if isCreating {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else {
+                        Text("Create Pair")
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.pink)
+                .disabled(isCreating || displayName.isEmpty)
+            }
 
             if let error = errorMessage {
                 Text(error)
                     .font(.caption)
                     .foregroundStyle(.red)
+                    .padding(.horizontal)
             }
         }
+        .padding(.horizontal, 32)
     }
 
-    private var createSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Create a Pair")
-                .font(.system(size: 14, weight: .semibold))
+    // MARK: - Join Section
 
-            Image(systemName: "square.and.arrow.up.fill")
-                .font(.system(size: 40))
-                .foregroundStyle(Color.accentColor)
+    private var joinSection: some View {
+        VStack(spacing: 20) {
+            formCard {
+                Image(systemName: "person.badge.plus.fill")
+                    .font(.system(size: 36))
+                    .foregroundStyle(.pink)
 
-            Text("Generate a code to share with your partner")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                Text("Join a pair")
+                    .font(.system(size: 15, weight: .medium))
 
-            TextField("Your Name", text: $displayName)
-                .textFieldStyle(.roundedBorder)
+                Text("Enter the invite code your partner shared with you.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
 
-            Button(action: createPair) {
-                if isCreating {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                } else {
-                    Text("Create")
-                        .frame(maxWidth: .infinity)
+                VStack(spacing: 12) {
+                    TextField("Invite Code (e.g. ABC-1234)", text: $inviteCode)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.system(size: 13, design: .monospaced))
+                        .textCase(.uppercase)
+                        .onChange(of: inviteCode) { _, newValue in
+                            inviteCode = newValue.uppercased()
+                        }
+
+                    TextField("Your Name", text: $displayName)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.system(size: 13))
                 }
+
+                Button(action: joinPair) {
+                    if isJoining {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else {
+                        Text("Join")
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.pink)
+                .disabled(isJoining || inviteCode.count < 5 || displayName.isEmpty)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(isCreating || displayName.isEmpty)
+
+            if let error = errorMessage {
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding(.horizontal)
+            }
         }
+        .padding(.horizontal, 32)
     }
+
+    // MARK: - Waiting View
 
     private func waitingView(_ code: String) -> some View {
-        VStack(spacing: 20) {
-            Image(systemName: "square.and.arrow.up.fill")
-                .font(.system(size: 40))
-                .foregroundStyle(Color.accentColor)
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "heart.fill")
+                .font(.system(size: 32))
+                .foregroundStyle(.pink)
+                .scaleEffect(waitingHeartPulse ? 1.15 : 0.85)
+                .opacity(waitingHeartPulse ? 1 : 0.6)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                        waitingHeartPulse = true
+                    }
+                }
 
             Text("Share this code")
-                .font(.title2.weight(.semibold))
+                .font(.system(size: 18, weight: .semibold))
+
+            Text("Your partner enters this code to connect.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
 
             HStack(spacing: 8) {
                 Text(code)
-                    .font(.system(size: 36, design: .monospaced))
+                    .font(.system(size: 32, design: .monospaced))
                     .fontWeight(.bold)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .fill(Color(nsColor: .controlBackgroundColor))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(Color.pink.opacity(0.2), lineWidth: 1)
+                            )
                     )
 
                 Button {
@@ -208,47 +300,97 @@ struct PairingView: View {
                 .help("Copy code")
             }
 
-            Text("Waiting for partner to join...")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            ProgressView()
-                .scaleEffect(0.8)
+            HStack(spacing: 8) {
+                ProgressView()
+                    .scaleEffect(0.7)
+                Text("Waiting for partner...")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
 
             Button("Cancel", role: .destructive) {
                 cancelPairCreation()
             }
-            .padding(.top, 8)
+            .buttonStyle(.plain)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .padding(.top, 4)
+
+            Spacer()
         }
-        .padding(40)
+        .frame(maxWidth: 380)
     }
 
+    // MARK: - Paired View
+
     private func pairedView(_ pair: PairLocalState) -> some View {
-        VStack(spacing: 20) {
-            Image(systemName: "person.2.fill")
-                .font(.system(size: 48))
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 56))
                 .foregroundStyle(.green)
+                .scaleEffect(pairedAnimating ? 1 : 0.3)
+                .opacity(pairedAnimating ? 1 : 0)
+                .onAppear {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+                        pairedAnimating = true
+                    }
+                }
 
-            Text("Connected!")
-                .font(.title2.weight(.semibold))
+            VStack(spacing: 6) {
+                Text("Connected!")
+                    .font(.system(size: 22, weight: .semibold))
 
-            if !pair.partnerDisplayName.isEmpty {
-                Text("Paired with \(pair.partnerDisplayName)")
+                if !pair.partnerDisplayName.isEmpty {
+                    HStack(spacing: 6) {
+                        Text("Paired with")
+                            .foregroundStyle(.secondary)
+                        Text(pair.partnerDisplayName)
+                            .fontWeight(.medium)
+                    }
                     .font(.body)
-                    .foregroundStyle(.secondary)
+                }
             }
 
-            Text("Send a drawing!")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            VStack(spacing: 4) {
+                Image(systemName: "pencil.and.outline")
+                    .font(.system(size: 18))
+                    .foregroundStyle(.pink)
+                Text("Start drawing on the canvas!")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.top, 8)
 
             Button("Reset Pair", role: .destructive) {
                 Task { await resetPair() }
             }
+            .buttonStyle(.plain)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
             .padding(.top, 8)
+
+            Spacer()
         }
-        .padding(40)
+        .frame(maxWidth: 380)
     }
+
+    // MARK: - Form Card
+
+    private func formCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(spacing: 16) {
+            content()
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
+    }
+
+    // MARK: - Actions
 
     private func createPair() {
         Task {
@@ -274,8 +416,6 @@ struct PairingView: View {
                     do {
                         pair = try await pairRepo.createPair(userOneID: user.id)
                     } catch {
-                        // If create fails (e.g. unique constraint from stale row),
-                        // retry fetch — the pair may now be visible
                         if let recovered = try await pairRepo.fetchPair(for: user.id) {
                             pair = recovered
                         } else {
@@ -291,7 +431,6 @@ struct PairingView: View {
                     partnerName: nil,
                     inviteCode: pair.inviteCode
                 )
-                // Best-effort save — don't let storage failure break pairing
                 try? AppGroupStorage.shared.savePair(localState)
                 await MainActor.run {
                     self.pairState = localState
@@ -344,7 +483,6 @@ struct PairingView: View {
                     partnerName: partnerName,
                     inviteCode: pair.inviteCode
                 )
-                // Best-effort save — don't let storage failure break pairing
                 try? AppGroupStorage.shared.savePair(localState)
                 await MainActor.run {
                     self.pairState = localState
@@ -416,11 +554,10 @@ struct PairingView: View {
         if let pairRepo, let pair = pairState {
             try? await pairRepo.deletePair(id: pair.pairID)
         }
-        // Best-effort storage cleanup (may fail for ad-hoc sandbox)
         try? AppGroupStorage.shared.clearPair()
+        try? AppGroupStorage.shared.clearPartnerDrawing()
         try? AppGroupStorage.shared.clearHistory()
         try? AppGroupStorage.shared.clearPendingUpload()
-        // Always clear in-memory state regardless of disk failures
         pairState = nil
         generatedCode = nil
         inviteCode = ""
@@ -428,7 +565,6 @@ struct PairingView: View {
         currentPair = nil
         canvasViewModel.partnerName = ""
         errorMessage = nil
-        // Force sync status update so UI shows idle immediately
         canvasViewModel.syncStatus = .idle
     }
 

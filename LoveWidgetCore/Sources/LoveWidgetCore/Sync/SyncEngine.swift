@@ -225,23 +225,32 @@ public actor SyncEngine {
         currentDrawing = merged
         lastSyncedDrawing = merged
 
-        // Persist and reload widget
-        try? storage.saveDrawing(merged)
+        // Persist the partner's drawing separately for menu bar display
+        // (the merged drawing stays in memory for sync continuity)
+        try? storage.savePartnerDrawing(remote)
         reloadWidgetTimeline()
 
-        // Notify the UI
-        await delegate?.syncEngine(self, didReceiveRemoteDrawing: merged)
+        // Notify UI with the original remote (partner's strokes only)
+        await delegate?.syncEngine(self, didReceiveRemoteDrawing: remote)
         setStatus(.connected)
     }
 
     private func fetchAndMergeRemoteDrawing() async {
-        guard let pairID else { return }
+        guard let pairID, let userID else { return }
         do {
-            let remote = try await drawingRepo.fetchDrawing(pairID: pairID)
-            if remote != .empty {
-                await handleRemoteDrawing(remote)
-            } else {
+            guard let (remote, createdBy) = try await drawingRepo.fetchDrawingWithAuthor(pairID: pairID) else {
                 setStatus(.connected)
+                return
+            }
+
+            if createdBy == userID {
+                // Drawing on the server is our own — merge into current state
+                // but don't treat it as a partner drawing for display
+                currentDrawing = await conflictResolver.merge(local: currentDrawing, remote: remote)
+                lastSyncedDrawing = currentDrawing
+                setStatus(.connected)
+            } else {
+                await handleRemoteDrawing(remote)
             }
         } catch {
             logger.warning("Initial fetch failed: \(error.localizedDescription)")
