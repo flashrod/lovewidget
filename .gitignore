@@ -1,0 +1,86 @@
+# ========================
+# LoveWidget .gitignore
+# ========================
+
+# CRITICAL: Never commit Supabase secrets
+Config.xcconfig
+
+# ========================
+# Xcode
+# ========================
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.hmap
+
+# ========================
+# Build artifacts
+# ========================
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+LoveWidget.app/
+*.app
+
+# ========================
+# Swift Package Manager
+# ========================
+.build/
+.swiftpm/
+*.resolved
+
+# ========================
+# macOS
+# ========================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# ========================
+# Homebrew
+# ========================
+Formula/*.rb.bak
+
+# ========================
+# CI artifacts
+# ========================
+*.xcarchive
+*.pkg
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/
+
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env.local
+*.pem
+*.key

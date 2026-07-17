@@ -1,0 +1,128 @@
+# LoveWidget — xcodegen Project Specification
+# Generate the Xcode project with: xcodegen generate
+# Install xcodegen: brew install xcodegen
+#
+# IMPORTANT: Run `cp Config.xcconfig.template Config.xcconfig` and fill
+# in your Supabase credentials before building.
+
+name: LoveWidget
+
+options:
+  bundleIdPrefix: com.lovewidget
+  deploymentTarget:
+    macOS: "14.0"
+  developmentLanguage: en
+  generateEmptyDirectories: true
+  usesTabs: false
+  indentWidth: 4
+  tabWidth: 4
+
+configs:
+  Debug: debug
+  Release: release
+
+# Swift Package dependencies
+packages:
+  supabase-swift:
+    url: https://github.com/supabase/supabase-swift.git
+    from: "2.0.0"
+  LoveWidgetCore:
+    path: LoveWidgetCore
+
+# Shared build settings applied to all targets
+settingGroups:
+  appSettings:
+    base:
+      SWIFT_VERSION: "6.0"
+      MACOSX_DEPLOYMENT_TARGET: "14.0"
+      ENABLE_HARDENED_RUNTIME: YES
+      SWIFT_STRICT_CONCURRENCY: complete
+      GCC_OPTIMIZATION_LEVEL: "0"
+      SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+    configs:
+      Release:
+        GCC_OPTIMIZATION_LEVEL: s
+        SWIFT_OPTIMIZATION_LEVEL: "-O"
+        DEBUG_INFORMATION_FORMAT: "dwarf-with-dsym"
+
+targets:
+
+  # ==========================================
+  # Main macOS Application
+  # ==========================================
+  LoveWidget:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+        excludes:
+          - "**/.DS_Store"
+          - "**/*.md"
+    settings:
+      groups: [appSettings]
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lovewidget.app
+        INFOPLIST_FILE: App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: LoveWidget.entitlements
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Automatic
+        OTHER_LDFLAGS: "$(inherited) -framework IOKit"
+      configFiles:
+        Debug: Config.xcconfig
+        Release: Config.xcconfig
+    dependencies:
+      - package: supabase-swift
+        product: Supabase
+      - package: LoveWidgetCore
+        product: LoveWidgetCore
+      - target: LoveWidgetExtension
+        embed: true
+        codeSign: true
+    preBuildScripts:
+      - name: "SwiftLint"
+        script: |
+          if which swiftlint >/dev/null; then
+            swiftlint --config "${SRCROOT}/.swiftlint.yml"
+          else
+            echo "warning: SwiftLint not installed — run: brew install swiftlint"
+          fi
+        basedOnDependencyAnalysis: false
+
+  # ==========================================
+  # WidgetKit Extension
+  # ==========================================
+  LoveWidgetExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: WidgetExtension
+        excludes:
+          - "**/.DS_Store"
+          - "**/*.md"
+    settings:
+      groups: [appSettings]
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lovewidget.app.widgetextension
+        INFOPLIST_FILE: WidgetExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: LoveWidgetExtension.entitlements
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Automatic
+        APPLICATION_EXTENSION_API_ONLY: YES
+    dependencies:
+      - package: LoveWidgetCore
+        product: LoveWidgetCore
+
+schemes:
+  LoveWidget:
+    build:
+      targets:
+        LoveWidget: all
+        LoveWidgetExtension: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

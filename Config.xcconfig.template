@@ -1,0 +1,16 @@
+// ============================================================
+// LoveWidget Supabase Configuration Template
+// ============================================================
+//
+// INSTRUCTIONS:
+//   1. Copy this file: cp Config.xcconfig.template Config.xcconfig
+//   2. Fill in your Supabase project values below
+//   3. NEVER commit Config.xcconfig to git (it is git-ignored)
+//
+// Get these values from:
+//   https://supabase.com/dashboard/project/<your-project>/settings/api
+//
+// ============================================================
+
+SUPABASE_URL = https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY = your-anon-key-here

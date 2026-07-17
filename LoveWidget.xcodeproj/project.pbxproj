@@ -1,0 +1,623 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1627796ECD5BDE67C313F1B2 /* SplineSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776A128215902BEC4C9741B9 /* SplineSmoothing.swift */; };
+		2B800B7D588094104525E807 /* LoveWidgetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDC2EDF3A7FDDC0BA76AE71 /* LoveWidgetApp.swift */; };
+		2D9E05653EB7CE2C196AE55C /* ConnectionStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC26CACF6FC3BEDED93C906 /* ConnectionStatusBadge.swift */; };
+		2EE4F3B976E04B7EDF10FE41 /* PairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7CA114131AFD1D4B73E1B7 /* PairingView.swift */; };
+		357EAF5CE54CA47C9ED22E84 /* MediumWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3888F6174F06BB5BBFBFB65 /* MediumWidgetView.swift */; };
+		4674C403896A765DA776A39F /* CanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82384529B8BD67606906E7A /* CanvasView.swift */; };
+		5EAD650A262A52D3D0A2EB9D /* LoveWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BCF11B0E829832645D18F09F /* LoveWidgetExtension.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6FE6C287DD0D09F77EBE849E /* CanvasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DC1D7464B90ABBDE31E36B /* CanvasViewModel.swift */; };
+		7726E431034B0767FA9A120F /* DrawingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908FC9E9875D6BDF518CC413 /* DrawingEngine.swift */; };
+		7C01FFB13ABCF10AF61B01C5 /* LoveWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4DC913F3D67D92AFA25E5E /* LoveWidgetExtension.swift */; };
+		828F91044776C172B47B9C4C /* DrawingToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4443427D5427C4DB5FA702FF /* DrawingToolbar.swift */; };
+		A3283896287BFB47921F9810 /* LoveWidgetCore in Frameworks */ = {isa = PBXBuildFile; productRef = 81B35F0DB3094896C4824BCE /* LoveWidgetCore */; };
+		A3F0D43E9D87224213F11048 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3D2541ECCD1499A1E28B45 /* ContentView.swift */; };
+		C10A4757B8D2F19C24BA4A1F /* LoveWidgetCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF3D7BDCC5E5F3D2ED9338AF /* LoveWidgetCore */; };
+		C362D61C6C257501D997E16F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67E1E2125B5690C10D00F8E /* AppDelegate.swift */; };
+		C84189AE98F6E6FB0457C760 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 9C5AA7BF345E0798A37E18E3 /* Supabase */; };
+		CD5E8DDBC36D49DB7DCD8635 /* SmallWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103553F314E4CC64CB1382EF /* SmallWidgetView.swift */; };
+		D210838AA4D24325B45551A2 /* LargeWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61B9A301F77A2A8E3BBF449 /* LargeWidgetView.swift */; };
+		D544CF0B4C550642C170A292 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AA044A7DFD3422D33591A9 /* SettingsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AF7051610F1A3D2AB248604B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A64BC50B6A50E17DD26AD622 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2FB3FD4D8B4773D9B5D62809;
+			remoteInfo = LoveWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8D49BC5847C324F778C7A912 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5EAD650A262A52D3D0A2EB9D /* LoveWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		103553F314E4CC64CB1382EF /* SmallWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallWidgetView.swift; sourceTree = "<group>"; };
+		2C3D2541ECCD1499A1E28B45 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2EA253FEBA63F0C901C2C882 /* LoveWidgetCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = LoveWidgetCore; path = LoveWidgetCore; sourceTree = SOURCE_ROOT; };
+		2F7CA114131AFD1D4B73E1B7 /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
+		35AA044A7DFD3422D33591A9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		4443427D5427C4DB5FA702FF /* DrawingToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingToolbar.swift; sourceTree = "<group>"; };
+		5AC26CACF6FC3BEDED93C906 /* ConnectionStatusBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStatusBadge.swift; sourceTree = "<group>"; };
+		74AC17C01E887C5B4F64D88B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		75C0FBC10D65D8147D82DD97 /* LoveWidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoveWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		776A128215902BEC4C9741B9 /* SplineSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplineSmoothing.swift; sourceTree = "<group>"; };
+		908FC9E9875D6BDF518CC413 /* DrawingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingEngine.swift; sourceTree = "<group>"; };
+		A67E1E2125B5690C10D00F8E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B3888F6174F06BB5BBFBFB65 /* MediumWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumWidgetView.swift; sourceTree = "<group>"; };
+		BC4DC913F3D67D92AFA25E5E /* LoveWidgetExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveWidgetExtension.swift; sourceTree = "<group>"; };
+		BCF11B0E829832645D18F09F /* LoveWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LoveWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BFDC2EDF3A7FDDC0BA76AE71 /* LoveWidgetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoveWidgetApp.swift; sourceTree = "<group>"; };
+		C6DC1D7464B90ABBDE31E36B /* CanvasViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasViewModel.swift; sourceTree = "<group>"; };
+		CE2C24096CAD6B7B6AB9B75E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D61B9A301F77A2A8E3BBF449 /* LargeWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeWidgetView.swift; sourceTree = "<group>"; };
+		E82384529B8BD67606906E7A /* CanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C4F04E4A192999424C21661E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C84189AE98F6E6FB0457C760 /* Supabase in Frameworks */,
+				A3283896287BFB47921F9810 /* LoveWidgetCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAFA60379CA3E8AE76B593B0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C10A4757B8D2F19C24BA4A1F /* LoveWidgetCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		40CDA89E465BBC298DE81453 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				75C0FBC10D65D8147D82DD97 /* LoveWidget.app */,
+				BCF11B0E829832645D18F09F /* LoveWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		441C2F5AA21018EE6D85A7AF /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				5AC26CACF6FC3BEDED93C906 /* ConnectionStatusBadge.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		522BDE9A8C17730A5C1FE318 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				2EA253FEBA63F0C901C2C882 /* LoveWidgetCore */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		5C2A29C45E409BDB1F7FF34F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D61B9A301F77A2A8E3BBF449 /* LargeWidgetView.swift */,
+				B3888F6174F06BB5BBFBFB65 /* MediumWidgetView.swift */,
+				103553F314E4CC64CB1382EF /* SmallWidgetView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		6F028FE8AAD6E802ADB8B0E4 /* WidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				CE2C24096CAD6B7B6AB9B75E /* Info.plist */,
+				BC4DC913F3D67D92AFA25E5E /* LoveWidgetExtension.swift */,
+				5C2A29C45E409BDB1F7FF34F /* Views */,
+			);
+			path = WidgetExtension;
+			sourceTree = "<group>";
+		};
+		942BCC47CAAFF95080CBB902 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A67E1E2125B5690C10D00F8E /* AppDelegate.swift */,
+				2C3D2541ECCD1499A1E28B45 /* ContentView.swift */,
+				74AC17C01E887C5B4F64D88B /* Info.plist */,
+				BFDC2EDF3A7FDDC0BA76AE71 /* LoveWidgetApp.swift */,
+				2F7CA114131AFD1D4B73E1B7 /* PairingView.swift */,
+				35AA044A7DFD3422D33591A9 /* SettingsView.swift */,
+				986CDA2AB7FEA2460D10CA65 /* Canvas */,
+				441C2F5AA21018EE6D85A7AF /* Components */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		986CDA2AB7FEA2460D10CA65 /* Canvas */ = {
+			isa = PBXGroup;
+			children = (
+				E82384529B8BD67606906E7A /* CanvasView.swift */,
+				C6DC1D7464B90ABBDE31E36B /* CanvasViewModel.swift */,
+				908FC9E9875D6BDF518CC413 /* DrawingEngine.swift */,
+				4443427D5427C4DB5FA702FF /* DrawingToolbar.swift */,
+				776A128215902BEC4C9741B9 /* SplineSmoothing.swift */,
+			);
+			path = Canvas;
+			sourceTree = "<group>";
+		};
+		DD797079DF5E23D59FEB6495 = {
+			isa = PBXGroup;
+			children = (
+				942BCC47CAAFF95080CBB902 /* App */,
+				522BDE9A8C17730A5C1FE318 /* Packages */,
+				6F028FE8AAD6E802ADB8B0E4 /* WidgetExtension */,
+				40CDA89E465BBC298DE81453 /* Products */,
+			);
+			indentWidth = 4;
+			sourceTree = "<group>";
+			tabWidth = 4;
+			usesTabs = 0;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2FB3FD4D8B4773D9B5D62809 /* LoveWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 456E0A34BD7772B046063410 /* Build configuration list for PBXNativeTarget "LoveWidgetExtension" */;
+			buildPhases = (
+				ADA05FF3121B1317052DB28B /* Sources */,
+				EAFA60379CA3E8AE76B593B0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LoveWidgetExtension;
+			packageProductDependencies = (
+				DF3D7BDCC5E5F3D2ED9338AF /* LoveWidgetCore */,
+			);
+			productName = LoveWidgetExtension;
+			productReference = BCF11B0E829832645D18F09F /* LoveWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		690CAE12DF7DF185072AE5A7 /* LoveWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B655B68698F0408FF5FC5901 /* Build configuration list for PBXNativeTarget "LoveWidget" */;
+			buildPhases = (
+				2026D69BEA5699D1D3D6719D /* SwiftLint */,
+				9933829C2C72C76517840B84 /* Sources */,
+				C4F04E4A192999424C21661E /* Frameworks */,
+				8D49BC5847C324F778C7A912 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E0BBF5961AB3FFCE17FE680F /* PBXTargetDependency */,
+			);
+			name = LoveWidget;
+			packageProductDependencies = (
+				9C5AA7BF345E0798A37E18E3 /* Supabase */,
+				81B35F0DB3094896C4824BCE /* LoveWidgetCore */,
+			);
+			productName = LoveWidget;
+			productReference = 75C0FBC10D65D8147D82DD97 /* LoveWidget.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A64BC50B6A50E17DD26AD622 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					2FB3FD4D8B4773D9B5D62809 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					690CAE12DF7DF185072AE5A7 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9F42E479559AC20A18FDDCD9 /* Build configuration list for PBXProject "LoveWidget" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = DD797079DF5E23D59FEB6495;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2D91E2FC06EDCF47AB79092F /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				415DF33C34E8CEB2711FD8A4 /* XCLocalSwiftPackageReference "LoveWidgetCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 40CDA89E465BBC298DE81453 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				690CAE12DF7DF185072AE5A7 /* LoveWidget */,
+				2FB3FD4D8B4773D9B5D62809 /* LoveWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2026D69BEA5699D1D3D6719D /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint --config \"${SRCROOT}/.swiftlint.yml\"\nelse\n  echo \"warning: SwiftLint not installed — run: brew install swiftlint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9933829C2C72C76517840B84 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C362D61C6C257501D997E16F /* AppDelegate.swift in Sources */,
+				4674C403896A765DA776A39F /* CanvasView.swift in Sources */,
+				6FE6C287DD0D09F77EBE849E /* CanvasViewModel.swift in Sources */,
+				2D9E05653EB7CE2C196AE55C /* ConnectionStatusBadge.swift in Sources */,
+				A3F0D43E9D87224213F11048 /* ContentView.swift in Sources */,
+				7726E431034B0767FA9A120F /* DrawingEngine.swift in Sources */,
+				828F91044776C172B47B9C4C /* DrawingToolbar.swift in Sources */,
+				2B800B7D588094104525E807 /* LoveWidgetApp.swift in Sources */,
+				2EE4F3B976E04B7EDF10FE41 /* PairingView.swift in Sources */,
+				D544CF0B4C550642C170A292 /* SettingsView.swift in Sources */,
+				1627796ECD5BDE67C313F1B2 /* SplineSmoothing.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ADA05FF3121B1317052DB28B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D210838AA4D24325B45551A2 /* LargeWidgetView.swift in Sources */,
+				7C01FFB13ABCF10AF61B01C5 /* LoveWidgetExtension.swift in Sources */,
+				357EAF5CE54CA47C9ED22E84 /* MediumWidgetView.swift in Sources */,
+				CD5E8DDBC36D49DB7DCD8635 /* SmallWidgetView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E0BBF5961AB3FFCE17FE680F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2FB3FD4D8B4773D9B5D62809 /* LoveWidgetExtension */;
+			targetProxy = AF7051610F1A3D2AB248604B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0F7F5B6074F286854C645C61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = LoveWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				INFOPLIST_FILE = WidgetExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lovewidget.app.widgetextension;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		11905B95B96367114637A4FE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		1EB2F9D16937F36544D66E49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		8CB574824CA84DCE89F59203 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LoveWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				OTHER_LDFLAGS = "$(inherited) -framework IOKit";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lovewidget.app;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		92C621C6D0050990853F0167 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = LoveWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = WidgetExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lovewidget.app.widgetextension;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		D5A72511C61F81F366DAC9D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LoveWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				OTHER_LDFLAGS = "$(inherited) -framework IOKit";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lovewidget.app;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		456E0A34BD7772B046063410 /* Build configuration list for PBXNativeTarget "LoveWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				92C621C6D0050990853F0167 /* Debug */,
+				0F7F5B6074F286854C645C61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9F42E479559AC20A18FDDCD9 /* Build configuration list for PBXProject "LoveWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1EB2F9D16937F36544D66E49 /* Debug */,
+				11905B95B96367114637A4FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B655B68698F0408FF5FC5901 /* Build configuration list for PBXNativeTarget "LoveWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5A72511C61F81F366DAC9D9 /* Debug */,
+				8CB574824CA84DCE89F59203 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		415DF33C34E8CEB2711FD8A4 /* XCLocalSwiftPackageReference "LoveWidgetCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = LoveWidgetCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2D91E2FC06EDCF47AB79092F /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		81B35F0DB3094896C4824BCE /* LoveWidgetCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoveWidgetCore;
+		};
+		9C5AA7BF345E0798A37E18E3 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2D91E2FC06EDCF47AB79092F /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		DF3D7BDCC5E5F3D2ED9338AF /* LoveWidgetCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoveWidgetCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A64BC50B6A50E17DD26AD622 /* Project object */;
+}
