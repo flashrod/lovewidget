@@ -354,25 +354,20 @@ struct PairingView: View {
     }
 
     private func resetPair() async {
-        guard let pairRepo else { return }
-        do {
-            await syncEngine?.stop()
-            if let pair = pairState {
-                try await pairRepo.deletePair(id: pair.pairID)
-            }
-            try AppGroupStorage.shared.clearPair()
-            await MainActor.run {
-                pairState = nil
-                generatedCode = nil
-                inviteCode = ""
-                currentUser = nil
-                currentPair = nil
-                canvasViewModel.partnerName = ""
-            }
-        } catch {
-            await MainActor.run {
-                errorMessage = error.localizedDescription
-            }
+        await syncEngine?.stop()
+        if let pairRepo, let pair = pairState {
+            // Best-effort remote delete (may fail if RLS policy missing)
+            try? await pairRepo.deletePair(id: pair.pairID)
+        }
+        try? AppGroupStorage.shared.clearPair()
+        await MainActor.run {
+            pairState = nil
+            generatedCode = nil
+            inviteCode = ""
+            currentUser = nil
+            currentPair = nil
+            canvasViewModel.partnerName = ""
+            errorMessage = nil
         }
     }
 
