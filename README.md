@@ -85,6 +85,7 @@ Then update the same cask change in your tap repository (for example `flashrod/h
 
 ```bash
 brew tap flashrod/tap
+brew trust flashrod/tap
 brew install --cask lovewidget
 ```
 
