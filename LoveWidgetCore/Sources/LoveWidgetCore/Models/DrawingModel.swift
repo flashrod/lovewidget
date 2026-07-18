@@ -278,6 +278,15 @@ public struct Drawing: Codable, Sendable, Equatable {
         strokes.first { $0.id == id }
     }
 
+    /// Returns a new Drawing with only strokes NOT authored by the given user.
+    public func strokes(excluding authorID: UUID) -> Drawing {
+        Drawing(
+            strokes: strokes.filter { $0.authorID != authorID },
+            updatedAt: updatedAt,
+            version: version
+        )
+    }
+
     // MARK: - Metadata
 
     /// Estimated compressed JSON size in bytes (used for sync budget decisions)
