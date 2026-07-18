@@ -3,7 +3,7 @@ import LoveWidgetCore
 
 struct CanvasView: View {
 
-    var viewModel: CanvasViewModel
+    @State var viewModel: CanvasViewModel
     @State private var isDrawing: Bool = false
     @State private var showSentToast: Bool = false
     @State private var showNoPairToast: Bool = false
