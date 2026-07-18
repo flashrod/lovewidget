@@ -225,8 +225,10 @@ public actor SyncEngine {
         currentDrawing = merged
         lastSyncedDrawing = merged
 
+        // Persist the merged drawing so it survives app relaunch
+        try? storage.saveDrawing(merged)
+
         // Persist the partner's drawing separately for menu bar display
-        // (the merged drawing stays in memory for sync continuity)
         try? storage.savePartnerDrawing(remote)
         reloadWidgetTimeline()
 
@@ -245,9 +247,13 @@ public actor SyncEngine {
 
             if createdBy == userID {
                 // Drawing on the server is our own — merge into current state
-                // but don't treat it as a partner drawing for display
                 currentDrawing = await conflictResolver.merge(local: currentDrawing, remote: remote)
                 lastSyncedDrawing = currentDrawing
+                // Remote may contain partner strokes from a prior merge;
+                // update the UI's partner drawing regardless.
+                try? storage.savePartnerDrawing(remote)
+                reloadWidgetTimeline()
+                await delegate?.syncEngine(self, didReceiveRemoteDrawing: remote)
                 setStatus(.connected)
             } else {
                 await handleRemoteDrawing(remote)
