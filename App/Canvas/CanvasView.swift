@@ -140,6 +140,20 @@ struct CanvasView: View {
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
+                Button {
+                    viewModel.fetchLatestDrawing()
+                } label: {
+                    if viewModel.isFetchingPartner {
+                        ProgressView()
+                            .scaleEffect(0.7)
+                            .frame(width: 16, height: 16)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.caption)
+                    }
+                }
+                .buttonStyle(.plain)
+                .help("Fetch latest from server")
             }
 
             if viewModel.partnerDrawing.strokes.isEmpty {

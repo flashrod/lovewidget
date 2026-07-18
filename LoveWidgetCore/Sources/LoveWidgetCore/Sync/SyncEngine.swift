@@ -265,6 +265,27 @@ public actor SyncEngine {
         }
     }
 
+    /// Manually fetch the latest drawing from the server and update the UI.
+    public func fetchLatestPartnerDrawing() async {
+        guard let pairID, let userID else { return }
+        do {
+            guard let (remote, createdBy) = try await drawingRepo.fetchDrawingWithAuthor(pairID: pairID) else {
+                logger.info("No remote drawing found.")
+                return
+            }
+            if createdBy == userID {
+                let partnerStrokes = remote.strokes(excluding: userID)
+                try? storage.savePartnerDrawing(partnerStrokes)
+                reloadWidgetTimeline()
+                await delegate?.syncEngine(self, didReceiveRemoteDrawing: partnerStrokes)
+            } else {
+                await handleRemoteDrawing(remote)
+            }
+        } catch {
+            logger.warning("Manual fetch failed: \(error.localizedDescription)")
+        }
+    }
+
     // MARK: - Pending Upload Retry
 
     private func retryPendingUploadIfNeeded() async {

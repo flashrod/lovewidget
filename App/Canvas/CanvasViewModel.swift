@@ -53,6 +53,9 @@ public final class CanvasViewModel {
     /// Non-nil when the last send failed (cleared on next successful send)
     public var lastSendError: String?
 
+    /// Whether a manual fetch is in progress
+    public var isFetchingPartner: Bool = false
+
     // MARK: - Private
 
     private let engine: DrawingEngine
@@ -170,6 +173,14 @@ public final class CanvasViewModel {
         reactions.append((emoji, Date()))
         if reactions.count > 20 {
             reactions = Array(reactions.suffix(20))
+        }
+    }
+
+    public func fetchLatestDrawing() {
+        Task {
+            isFetchingPartner = true
+            await syncEngine?.fetchLatestPartnerDrawing()
+            isFetchingPartner = false
         }
     }
 
