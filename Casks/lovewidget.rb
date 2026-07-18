@@ -1,6 +1,6 @@
 cask "lovewidget" do
-  version "1.0.3"
-  sha256 "6ed91a62e5e7026653992216a6e732bad1ba5684ff1413383b8ad6aecd9c77d4"
+  version "1.0.4"
+  sha256 "504364362079e8498ffa884426feee2d8614c247ead84abb55b70501c3a405eb"
 
   url "https://github.com/flashrod/lovewidget/releases/download/v#{version}/LoveWidget-#{version}.dmg"
   name "LoveWidget"
