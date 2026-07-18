@@ -56,6 +56,16 @@ public final class CanvasViewModel {
     /// Whether a manual fetch is in progress
     public var isFetchingPartner: Bool = false
 
+    /// The current user's auth UID — set after authentication.
+    /// Used to tag new strokes so partner filtering works correctly.
+    public var currentUserID: UUID? {
+        didSet {
+            if let id = currentUserID {
+                engine.currentUserID = id
+            }
+        }
+    }
+
     // MARK: - Private
 
     private let engine: DrawingEngine

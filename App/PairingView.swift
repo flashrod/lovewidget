@@ -408,6 +408,7 @@ struct PairingView: View {
                 )
                 currentUser = user
                 saveUserSettings(userID: user.id)
+                await MainActor.run { canvasViewModel.currentUserID = user.id }
 
                 let pair: Pair
                 if let existing = try await pairRepo.fetchPair(for: user.id) {
@@ -467,6 +468,7 @@ struct PairingView: View {
                 )
                 currentUser = user
                 saveUserSettings(userID: user.id)
+                await MainActor.run { canvasViewModel.currentUserID = user.id }
 
                 let pair = try await pairRepo.joinPair(
                     inviteCode: normalized,

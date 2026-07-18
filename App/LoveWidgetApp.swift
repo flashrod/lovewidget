@@ -77,6 +77,7 @@ struct LoveWidgetApp: App {
             }
 
             if let localPair = try? storage.loadPair(), let userID = try? storage.loadSettings().userID {
+                await MainActor.run { canvasViewModel.currentUserID = userID }
                 Task {
                     await engine.start(pairID: localPair.pairID, userID: userID)
                 }
